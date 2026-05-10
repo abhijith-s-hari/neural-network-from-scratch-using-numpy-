@@ -1,6 +1,5 @@
-import numpy as np 
 
-
+import numpy as np
 def network_initiate(no_input, no_of_layers, neurons, output):
         
     network = {}
@@ -28,3 +27,27 @@ def network_initiate(no_input, no_of_layers, neurons, output):
     
     
     return network
+
+def weighted_sum(inputs, weight, bias):
+    return np.sum(weight * inputs) + bias
+
+def activation(weighted_sum):
+    return 1/(1 + np.exp(-weighted_sum))
+def input_gen(no_input):
+    return np.random.uniform(size = no_input)
+
+def foreward_prop(network, inputs):
+    inp = list(inputs)
+    #output = []
+    for layer in network:
+        layer_data = network[layer]
+        output = []
+        
+        for node in layer_data:
+            node_data = layer_data[node]
+            z = weighted_sum(inputs, weight = node_data['weight'], bias = node_data['bias'])
+            neuron_output = activation(z)
+            output.append(neuron_output)
+
+    return output
+
