@@ -51,3 +51,8 @@ def foreward_prop(network, inputs):
 
     return output
 
+#making prediction using the network
+my_net = network_initiate(2, 3, [2, 2, 2], 1)
+inp = input_gen(2)
+x = foreward_prop(my_net, inp)
+print(x)
