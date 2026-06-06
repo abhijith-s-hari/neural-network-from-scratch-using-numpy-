@@ -1,4 +1,4 @@
-from multipledispatch import dispatch
+#from multipledispatch import dispatch
 import numpy as np 
 
 # declaring and initiating a dictionary, that will contain all the required activation functions and its derivattive 
@@ -15,10 +15,6 @@ activation_functions = {
        'tanh' : {
            'foreward' : lambda z : np.tanh(z), 
            'backward' : lambda z : 1 - np.tanh(z)**2 
-       }, 
-       'linear': {
-           'foreward' : lambda z : z, 
-           'backward' : lambda z : np.ones_like(z)
        }
    }
 
@@ -35,6 +31,16 @@ class layerclass:  #the class layer contains methods that the neural_network cla
         self.weight = np.random.randn(n_input, n_output) * scale 
         self.bias = np.random.randn(1, n_output)
         self.act_fun = act_fun
+
+    '''
+    def relu(self, z):
+        a = np.maximum(0, z)
+        return a 
+    
+    def sigmoid(self, z):
+        a = 1 / (1 + np.exp(-z))
+        return a 
+    ''' 
 
     def forward_pass(self, input_value):
         self.input_value = input_value  
@@ -63,6 +69,7 @@ class neural_network:
 
     def __init__(self):
         self.layer_list = []
+        self.activation = ''
     
     def add_layer(self, inp, out, actv_function):  
         new_layer  = layerclass(inp, out, actv_function)
@@ -70,12 +77,10 @@ class neural_network:
        # self.activation = actv_function
 
     def train(self, xtrain, ytrain,batch_size, alpha = 0.01, epoch = 100): #todo batch size 
-        #act_fun = self.activation
+        act_fun = self.activation
         losses = []
-        sum = 0
         for i in range(1, epoch + 1):
-            #print(f"Epoch: {i}")
-
+            print(f"Epoch: {i}")
             # foreward propogation
             current_data = xtrain
 
@@ -88,11 +93,7 @@ class neural_network:
                 new_error_gradient = layers.back_prop(error_gradient = error_gradient, learning_rate = alpha)
                 error_gradient = new_error_gradient
             losses.append(calculated_loss)
-            for j in range(len(ytrain)):
-                if current_data[j] == ytrain[j]:
-                    sum = sum + 1
-            accuracy = sum / len(ytrain) * 100
-            print(f"Epoch: {i}  Accuracy: {accuracy}")
+
         return current_data, losses
 
     # function to print out the weights and biases of each layer, also shows the no of nurons in each layer 

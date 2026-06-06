@@ -1,23 +1,46 @@
 import numpy as np
-import nnfd
+import nnfs
 import matplotlib.pyplot as plt 
-x_test = np.array([
-    [0.5, 0.2], [0.1, 0.9], [0.3, 0.4], [0.8, 0.1], [0.2, 0.7],
-    [0.6, 0.5], [0.9, 0.9], [0.0, 0.2], [0.4, 0.6], [0.7, 0.3],
-    [0.1, 0.1], [0.5, 0.8], [0.8, 0.6], [0.2, 0.3], [0.6, 0.9],
-    [0.3, 0.2], [0.7, 0.7], [0.4, 0.1], [0.9, 0.4], [0.0, 0.8]
-])
-y_test = np.random.randint(0, 2, size=(20, 1))
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+import pandas as pd 
 
-network = nnfd.neural_network()
-network.add_layer(2, 4)
-network.add_layer(4, 8)
-network.add_layer(8, 16)
-network.add_layer(16, 1)
+data = pd.read_csv('df_train.csv')
+cols_to_drop = [
+    'date', 'nice_view', 'perfect_condition', 'real_bathrooms', 
+    'has_lavatory', 'single_floor', 'month', 'quartile_zone'
+]
+data = data.drop(columns=cols_to_drop)
+xtrain = data.drop(['price'], axis=1)
+ytrain = data[['price']]
 
-pred, loss = network.train(x_test, y_test, batch_size=20, alpha=0.01, epoch=1000)
+ss = StandardScaler()
+ohe = OneHotEncoder()
+base_encoded = ohe.fit_transform(xtrain[['has_basement']]).toarray()
+ren_encoded = ohe.fit_transform(xtrain[['renovated']]).toarray()
+beds_scaled = ss.fit_transform(xtrain[['bedrooms']])
+grade_scaled = ss.fit_transform(xtrain[['grade']])
+living_scaled = ss.fit_transform(xtrain[['living_in_m2']])
+
+xtrain = np.hstack([base_encoded, ren_encoded, beds_scaled, grade_scaled, living_scaled])
+ytrain = ss.fit_transform(ytrain)
+print(f"X Matrix Shape (Must be 2D): {xtrain.shape}")
+#print(f"Y Matrix Shape (Must be 2D): {y_train_clean.shape}")
+
+
+
+network = nnfs.neural_network()
+network.add_layer(7, 4, 'relu')
+network.add_layer(4, 8, 'relu')
+network.add_layer(8, 16, 'relu')
+network.add_layer(16, 1, 'linear')
+
+pred, loss = network.train(xtrain, ytrain, batch_size=13603, alpha=0.001, epoch=500)
 loss = np.array(loss)
-print(f"Predictted values: {pred} loss: {loss}" )
-print(f"Shape of loss: {loss.shape}")
+print(f"Actual Value: {ytrain} \n")
+print(f"Predictted values: {pred} \n")
+print(f"Loss: {loss} \n")      
+print(f"Shape of loss: {loss.shape} \n")
 plt.plot(loss)
 plt.show()
+
+#network.network_info()
