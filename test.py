@@ -29,12 +29,11 @@ print(f"X Matrix Shape (Must be 2D): {xtrain.shape}")
 
 
 network = nnfs.neural_network()
-network.add_layer(7, 4, 'relu')
-network.add_layer(4, 8, 'relu')
-network.add_layer(8, 16, 'relu')
-network.add_layer(16, 1, 'linear')
+network.add_layer(7, 7, 'relu')
+network.add_layer(7, 8, 'relu')
+network.add_layer(8, 1, 'linear')
 
-pred, loss = network.train(xtrain, ytrain, batch_size=13603, alpha=0.001, epoch=500)
+pred, loss = network.train(xtrain, ytrain, batch_size=13603, alpha=0.001, epoch=100)
 loss = np.array(loss)
 print(f"Actual Value: {ytrain} \n")
 print(f"Predictted values: {pred} \n")
